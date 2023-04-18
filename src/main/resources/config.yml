@@ -1,0 +1,6 @@
+#https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+materials:
+  observer: 4
+  slime_block: 4
+cleanOnChunkLoad: false
+notifyOnChunkLoad: true

@@ -21,10 +21,10 @@ public class ConfigManager {
 
     private void setupConfig() {
         FileConfiguration config = plugin.getConfig();
-        config.addDefault("materials.observer", 4);
-        config.addDefault("materials.spawner", 5);
-        config.addDefault("cleanOnChunkLoad", false);
-        config.addDefault("notifyOnChunkLoad", true);
+//        config.addDefault("materials.observer", 4);
+//        config.addDefault("materials.spawner", 5);
+//        config.addDefault("cleanOnChunkLoad", false);
+//        config.addDefault("notifyOnChunkLoad", true);
         config.options().copyDefaults(true);
         plugin.saveConfig();
     }

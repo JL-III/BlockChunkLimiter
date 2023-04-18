@@ -1,23 +1,25 @@
 package com.jliii.blockchunklimiter.listeners;
 
-import com.jliii.blockchunklimiter.managers.SpawnerManager;
+import com.jliii.blockchunklimiter.managers.BlockManager;
 import com.jliii.blockchunklimiter.utils.PlayerNotifier;
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ChunkLoad implements Listener {
 
-    private final SpawnerManager spawnerManager;
+    private final BlockManager blockManager;
     private final PlayerNotifier playerNotifier;
-    private final int maxSpawners;
 
-    public ChunkLoad(PlayerNotifier playerNotifier, int maxSpawners) {
-        spawnerManager = new SpawnerManager();
+    public ChunkLoad(BlockManager blockManager, PlayerNotifier playerNotifier) {
+        this.blockManager = blockManager;
         this.playerNotifier = playerNotifier;
-        this.maxSpawners = maxSpawners;
     }
 
     // This method is called when a chunk is loaded
@@ -28,17 +30,22 @@ public class ChunkLoad implements Listener {
         }
 
         Chunk chunk = event.getChunk();
-        int spawnerCount = 0;
+        Map<Material, Integer> blockCounts = new HashMap<>();
 
         for (BlockState block : chunk.getTileEntities()) {
-            if (spawnerManager.isSpawner(block.getType())) {
-                spawnerCount++;
-                if (spawnerCount > maxSpawners) {
-                    spawnerManager.removeSpawner(block);
-                    playerNotifier.notifyPlayers(chunk.getWorld(), chunk, maxSpawners);
+            Material blockType = block.getType();
+            if (blockManager.isLimitedBlockMaterial(blockType)) {
+                int currentCount = blockCounts.getOrDefault(blockType, 0);
+                blockCounts.put(blockType, currentCount + 1);
+
+                int blockLimit = blockManager.getBlockLimit(blockType);
+                if (currentCount + 1 > blockLimit) {
+                    blockManager.removeBlock(block);
+                    playerNotifier.notifyPlayers(chunk.getWorld(), chunk, blockType, blockLimit);
                 }
             }
         }
     }
 }
+
 

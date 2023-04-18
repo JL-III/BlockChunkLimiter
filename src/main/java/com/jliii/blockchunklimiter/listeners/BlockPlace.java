@@ -1,9 +1,9 @@
 package com.jliii.blockchunklimiter.listeners;
 
-import org.bukkit.Bukkit;
+import com.jliii.blockchunklimiter.managers.BlockManager;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
-import org.bukkit.block.BlockState;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -11,30 +11,39 @@ import org.bukkit.event.block.BlockPlaceEvent;
 
 public class BlockPlace implements Listener {
 
-    private final Material spawnerMaterial;
-    private final int spawnerLimit;
+    private final BlockManager blockManager;
 
-    public BlockPlace(Material spawnerMaterial, int spawnerLimit) {
-        this.spawnerMaterial = spawnerMaterial;
-        this.spawnerLimit = spawnerLimit;
+    public BlockPlace(BlockManager blockManager) {
+        this.blockManager = blockManager;
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getBlockPlaced().getType() != spawnerMaterial) {
+        Material placedBlockType = event.getBlockPlaced().getType();
+
+        if (!blockManager.isLimitedBlockMaterial(placedBlockType)) {
             return;
         }
+
         Chunk chunk = event.getBlock().getLocation().getChunk();
-        int spawnercount = 0;
-        for (BlockState block : chunk.getTileEntities()) {
-            if (block.getType() == spawnerMaterial) {
-                spawnercount++;
-                if (spawnercount > spawnerLimit) {
-                    event.getPlayer().sendMessage("Too many Spawners in this chunk, " + spawnerLimit + " is the max!");
-                    event.setCancelled(true);
-                    break;
+        int blockCount = 0;
+        int blockLimit = blockManager.getBlockLimit(placedBlockType);
+
+        for (int x = 0; x < 16; x++) {
+            for (int y = -64; y < 320; y++) {
+                for (int z = 0; z < 16; z++) {
+                    Block block = chunk.getBlock(x, y, z);
+                    if (block.getType() == placedBlockType) {
+                        blockCount++;
+                        if (blockCount > blockLimit) {
+                            event.getPlayer().sendMessage("Too many " + placedBlockType.toString().toLowerCase() + "s in this chunk, " + blockLimit + " is the max!");
+                            event.setCancelled(true);
+                            return;
+                        }
+                    }
                 }
             }
         }
     }
 }
+

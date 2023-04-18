@@ -1,0 +1,22 @@
+name: BlockChunkLimiter
+version: '${project.version}'
+main: com.jliii.blockchunklimiter.BlockChunkLimiter
+api-version: 1.19
+authors: [ jliii ]
+description: Plugin used to limit specific blocks per chunk.
+commands:
+  spawnerlist:
+    description: lists spawners
+    usage: /spawnerlist
+    permission: chunkspawnerlimit.list
+  spawnerdelete:
+    description: deletes spawners
+    usage: /spawnerdelete
+    permission: chunkspawnerlimit.delete
+permissions:
+  chunkspawnerlimit.list:
+    description: Allows list command
+    default: op
+  chunkspawnerlimit.delete:
+    description: Allows delete command
+    default: op

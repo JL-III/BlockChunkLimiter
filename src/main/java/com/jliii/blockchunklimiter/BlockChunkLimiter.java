@@ -16,6 +16,7 @@ public final class BlockChunkLimiter extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         configManager = new ConfigManager(this);
         blockManager = new BlockManager();
         blockManager.setBlockLimits(configManager.getBlockLimits());
